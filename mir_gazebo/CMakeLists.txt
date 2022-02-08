@@ -32,8 +32,7 @@ install(DIRECTORY
 
 catkin_install_python(PROGRAMS
    controller/controller.py
-   src/path_publish.py
-   src/tf_listener.py
+
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 

@@ -1,5 +1,19 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- The gazebo_ros_laser plugin does the following:
+       - If the ROS parameter 'tf_prefix' is set, it prepends the
+       - tf_prefix in front of the frameName.
+       - Otherwise, it prepends the robotNamespace.
+
+       The robotNamespace gets automatically set if you start the
+       spawn_model node inside a namespace. In this case, set
+       prepend_prefix_to_laser_frame to 'false', otherwise the
+       resulting frameName will have two prefixes prepended.
+
+       If you don't start spawn_model inside a namespace but have a
+       non-empty prefix, set prepend_prefix_to_laser_frame to 'true'. -->
+  <xacro:arg name="prepend_prefix_to_laser_frame" default="false" />
+
   <xacro:include filename="$(find mir_description)/urdf/include/common_properties.urdf.xacro" />
   <xacro:include filename="$(find mir_description)/urdf/include/imu.gazebo.urdf.xacro" />
   <xacro:include filename="$(find mir_description)/urdf/include/mir_100.gazebo.xacro" />
@@ -28,8 +42,7 @@
   <xacro:property name="mir_100_caster_wheel_base_dy" value="0.203" />
   <xacro:property name="mir_100_caster_wheel_base_dz" value="${mir_100_caster_wheel_radius-mir_100_caster_wheel_dz}" />
 
-
-
+  <xacro:property name="imu_stdev" value="0.00017" />
 
   <xacro:macro name="actuated_wheel" params="prefix locationprefix locationright">
     <joint name="${prefix}${locationprefix}_wheel_joint" type="continuous">
@@ -52,9 +65,9 @@
         <xacro:insert_block name="material_dark_grey" />
       </visual>
       <collision>
-        <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <cylinder radius="${mir_100_act_wheel_radius}" length="${mir_100_act_wheel_width}" />
+          <mesh filename="package://mir_description/meshes/visual/wheel.stl" />
         </geometry>
       </collision>
     </link>
@@ -124,9 +137,9 @@
         <xacro:insert_block name="material_dark_grey" />
       </visual>
       <collision>
-        <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <cylinder radius="${mir_100_caster_wheel_radius}" length="${mir_100_caster_wheel_width}" />
+          <mesh filename="package://mir_description/meshes/visual/wheel.stl" />
         </geometry>
       </collision>
     </link>
@@ -175,7 +188,7 @@
 
     <link name="${prefix}imu_link" />
 
-    <xacro:imu_gazebo link="${prefix}imu_link" imu_topic="imu_data" update_rate="50.0" />
+    <xacro:imu_gazebo link="${prefix}imu_link" imu_topic="imu_data" update_rate="50.0" stdev="${imu_stdev}" />
 
     <!-- Create an alias for imu_link. This is necessary because the real MiR's
          TF has imu_link, but the imu_data topic is published in the imu_frame
@@ -194,16 +207,18 @@
       <child link="${prefix}front_laser_link" />
       <origin xyz="0.4288 0.2358 0.1914" rpy="0.0 0.0 ${0.25 * pi}" />  <!-- from visually matching up the meshes of the MiR and the laser scanner -->
     </joint>
-    <xacro:sick_s300 prefix="${prefix}" link="front_laser_link" topic="f_scan" />
+    <xacro:sick_s300 prefix="${prefix}" link="front_laser_link" topic="f_scan"
+                     prepend_prefix_to_laser_frame="$(arg prepend_prefix_to_laser_frame)" />
 
     <joint name="${prefix}base_link_to_back_laser_joint" type="fixed">
       <parent link="${prefix}base_link" />
-
-
       <child link="${prefix}back_laser_link" />
       <origin xyz="-0.3548 -0.2352 0.1914" rpy="0.0 0.0 ${-0.75 * pi}" />  <!-- from visually matching up the meshes of the MiR and the laser scanner -->
     </joint>
-    <xacro:sick_s300 prefix="${prefix}" link="back_laser_link" topic="b_scan" />
+
+    <xacro:sick_s300 prefix="${prefix}" link="back_laser_link" topic="b_scan"
+                     prepend_prefix_to_laser_frame="$(arg prepend_prefix_to_laser_frame)" />
+
 
 <!-- start defining camera -->
 
@@ -256,13 +271,4 @@
 
     <xacro:p3d_base_controller prefix="${prefix}" />
   </xacro:macro>
-
-
-<!-- start defining camera mir:: 
-
-     <xacro:camera_sensor xyz="0 0 ${0.04 + 0.02 + 0.04}" 
-                  rpy="0 0 0"
-                  parent="mir::base_footprint">
-    </xacro:camera_sensor>
-end defining camera -->
 </robot>

@@ -59,9 +59,4 @@
       </plugin>
     </gazebo>
   </xacro:macro>
-
-
-
-
-
 </robot>
