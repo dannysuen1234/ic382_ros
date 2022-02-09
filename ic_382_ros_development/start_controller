@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+source /home/vtl/industrial_ws/devel/setup.bash
+
+rosrun mir_gazebo controller.py

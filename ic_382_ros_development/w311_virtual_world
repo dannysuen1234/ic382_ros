@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+source /home/vtl/industrial_ws/devel/setup.bash
+
+roslaunch mir_gazebo mir_maze_world.launch
+
+
