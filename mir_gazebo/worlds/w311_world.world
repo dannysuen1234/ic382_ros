@@ -4,8 +4,9 @@
 
 <world name='default'>
 
+  
 
-    <light name='sun' type='directional'>
+ <light name='sun' type='point'>
       <cast_shadows>1</cast_shadows>
       <pose>0 0 0 0 -0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
@@ -17,7 +18,7 @@
         <quadratic>0.001</quadratic>
       </attenuation>
       <direction>0 0.5 -0</direction>
-    </light>
+    </light> 
 <light type="directional" name="directional">
       <pose>0 -2 2 0 0 0</pose>
       <diffuse>0.2 0.2 .2 1</diffuse>
@@ -31,7 +32,7 @@
       <direction>0 0 -1</direction>
       <cast_shadows>true</cast_shadows>
     </light>
-   
+
 
   </world>
 </sdf>

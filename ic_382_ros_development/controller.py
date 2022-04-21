@@ -1,1 +1,0 @@
-/home/vtl/industrial_ws/src/mir_robot/mir_gazebo/controller/controller.py
